@@ -1,0 +1,35 @@
+name: SimHub
+options:
+  bundleIdPrefix: com.simhub
+  deploymentTarget:
+    iOS: "16.0"
+
+packages:
+  WebRTC:
+    url: https://github.com/stasel/WebRTC-SPM
+    from: 125.0.0
+
+targets:
+  SimHub:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+    dependencies:
+      - package: WebRTC
+    info:
+      path: Generated/Info.plist
+      properties:
+        UILaunchScreen: {}
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
+        NSLocalNetworkUsageDescription: "SimHub connects to your Android hub over WiFi to show SIM signal, calls, and messages."
+        UIBackgroundModes:
+          - voip
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.simhub.ios
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+        CODE_SIGN_STYLE: Automatic

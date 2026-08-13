@@ -1,0 +1,36 @@
+workflows:
+  ios-simhub:
+    name: SimHub iOS
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      xcode: latest
+      ios_signing:
+        distribution_type: ad_hoc
+        bundle_identifier: com.simhub.ios
+      vars:
+        XCODE_PROJECT: "SimHub.xcodeproj"
+        XCODE_SCHEME: "SimHub"
+
+    scripts:
+      - name: Install XcodeGen
+        script: |
+          brew install xcodegen
+
+      - name: Generate Xcode project from project.yml
+        script: |
+          xcodegen generate
+
+      - name: Build and archive IPA
+        script: |
+          xcode-project build-ipa \
+            --project "$XCODE_PROJECT" \
+            --scheme "$XCODE_SCHEME"
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+
+    publishing:
+      email:
+        recipients:
+          - CHANGE_ME@example.com
