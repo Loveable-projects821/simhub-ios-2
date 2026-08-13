@@ -5,9 +5,6 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       xcode: latest
-      ios_signing:
-        distribution_type: ad_hoc
-        bundle_identifier: com.simhub.ios
       vars:
         XCODE_PROJECT: "SimHub.xcodeproj"
         XCODE_SCHEME: "SimHub"
@@ -21,16 +18,22 @@ workflows:
         script: |
           xcodegen generate
 
-      - name: Build and archive IPA
+      - name: Archive without code signing
         script: |
-          xcode-project build-ipa \
-            --project "$XCODE_PROJECT" \
-            --scheme "$XCODE_SCHEME"
+          xcodebuild -project "$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath build/SimHub.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            archive
+
+      - name: Package as unsigned IPA
+        script: |
+          mkdir -p build/ios/ipa/Payload
+          cp -r build/SimHub.xcarchive/Products/Applications/SimHub.app build/ios/ipa/Payload/
+          cd build/ios/ipa && zip -r SimHub.ipa Payload
 
     artifacts:
       - build/ios/ipa/*.ipa
-
-    publishing:
-      email:
-        recipients:
-          - CHANGE_ME@example.com
